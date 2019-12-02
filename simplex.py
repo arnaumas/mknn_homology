@@ -32,10 +32,10 @@ class Simplex():
     def __hash__(self):
         return reduce(operator.xor, [hash(p) for p in self.points])
 
-    def __str__(self):
-        return str(self.points) 
     def __repr__(self):
-        return self.__str__()
+        return str(self.points)
+    def __str__(self):
+        return f"{self.dim}-simplex with points " + self.__repr__()
 
 class Chain():
     """
@@ -65,14 +65,14 @@ class Chain():
     def __add__(self, other):
         return Chain(self.simplices ^ other.simplices)
 
-    def __str__(self):
+    def __repr__(self):
         if len(self.simplices) is 0:
             return "[]"
         else:
             return " + ".join([str(s) for s in self.simplices])
 
     def __repr__(self):
-        return self.__str__()
+        return f"Chain of {self.dim}-simplices: " + self.__repr__()
         
         
 
