@@ -7,10 +7,11 @@ class Clique():
 
     Required arguments:
         points -- points that make up the clique
+    Optional arguments:
         k -- the clique appears when computing mutual k-nearest neighbours
     """
 
-    def __init__(self, points, k):
+    def __init__(self, points, k = None):
         self.points = points
         self.k = k
         self.size = len(points)

@@ -1,55 +1,38 @@
-from simplex import Simplex, Chain
+from models import Clique, Simplex, Chain 
 import numpy as np
+import networkx as nx
+from scipy import sparse
+import operator
+from functools import reduce
 
-class Clique():
+    
+class Filtration():
     """
-    Model for a clique of n points of a cloud.
+    Simplicial filtration indexed by k built from a cloud of points by computing the
+    maximal cliques of the mutual k-nearest-neighbours of the cloud
 
     Required arguments:
-        points -- points that make up the clique
-        k -- the clique appears when computing mutual k-nearest neighbours
+        points -- Data cloud
     """
 
-    def __init__(self, points, ):
+    def __init__(points):
         self.points = points
-        self.size = len(points)
-        self.diameter = max([0] + [dist(*p) for p in combinations(points, 2)])
+        self.complex = []
 
-    def __str__(self):
-        return str(self.points)
-    
-def dist(x,y):
-    return sum((np.array(x) - np.array(y))**2)
+    def build_complex(self):
+        dist_matrix = self.points.compute_dist_matrix()
+        cliques = set()
 
-def compute_k_cliques(points, k):
-    # TODO: implement this function
-    return 0
+        for k in range(1, self.points.dimension):
+            # Construct the mutual kNN graph
+            graph = mknn_graph(k, dist_matrix)
 
-def create_clique_filtration(points):
-    # Maximum size of clique to allow
-    max_size = len(points[0])
-    
-    filtration = [Clique([p], 0) for p in points]
-    for k in range(1, len(points)):
-        # Add all of the new cliques
-        k_cliques = [c for c in compute_k_cliques(points, k)
-                if c not in filtration and c.size <= max_size]
-        cliques.extend(k_cliques)
-        
-    # Sort the cliques by order of appearance, size and then by diameter
-    filtration.sort(key = lambda c:(c.k, c.size, c.diameter))
+            # Gather all the maximal cliques
+            new_cliques = {Clique(c,k) for c in nx.find_cliques(graph) 
+                    if c.size <= max_size}
 
-    # Transform cliques into simplexes
-    return [(Simplex(clique), clique.k) for clique in filtration]
+            # Add the new cliques
+            cliques |=  new_cliques
 
-
-
-        
-
-
-
-        
-
-        
-
-        
+        self.complex = sorted(cliques, key = lambda c:(c.k, c.size, c.diameter)) 
+       
