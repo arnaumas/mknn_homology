@@ -1,6 +1,36 @@
 import operator
 from functools import reduce
 
+class Clique():
+    """
+    Model for a clique of n points of a cloud.
+
+    Required arguments:
+        points -- points that make up the clique
+        k -- the clique appears when computing mutual k-nearest neighbours
+    """
+
+    def __init__(self, points, k):
+        self.points = points
+        self.k = k
+        self.size = len(points)
+        self.diameter = max([0] + [dist(*p) for p in combinations(points, 2)])
+
+    def __eq__(self, other):
+       return (set(self.points) == set(other.points) 
+               and self.k == other.k)
+
+    def __hash__(self):
+        return reduce(operator.xor, [hash(p) for p in self.points])
+
+    def __repr__(self):
+        return str(self.points)
+
+    def __str__(self):
+        return (f"{self.size}-clique with points " 
+                + str(self.points) 
+                + " born at k = {self.k}")
+
 class Simplex():
     """
     Simplex of R^n.
@@ -33,9 +63,9 @@ class Simplex():
         return reduce(operator.xor, [hash(p) for p in self.points])
 
     def __repr__(self):
-        return str(self.points)
+        return "S" + str(self.points)
     def __str__(self):
-        return f"{self.dim}-simplex with points " + self.__repr__()
+        return f"{self.dim}-simplex with points " + str(self.points)
 
 class Chain():
     """
@@ -45,7 +75,7 @@ class Chain():
         simplices -- list of simplices of the chain
     """
     def __init__(self, simplices):
-        if not all([s.dim == list(simplices)[0].dim for s in simplices]):
+        if not all([s.dim == simplices[0].dim for s in simplices]):
             raise ValueError("All simplices of the chain should have the same dimension")
         self.simplices = set(simplices)
 
@@ -67,12 +97,12 @@ class Chain():
 
     def __repr__(self):
         if len(self.simplices) is 0:
-            return "[]"
+            return "C[]"
         else:
-            return " + ".join([str(s) for s in self.simplices])
+            return " + ".join([repr(s) for s in self.simplices])
 
-    def __repr__(self):
-        return f"Chain of {self.dim}-simplices: " + self.__repr__()
+    def __str__(self):
+        return f"Chain of {self.dim}-simplices: " + str(self.simplices)
         
         
 
