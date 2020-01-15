@@ -1,7 +1,9 @@
-from clique import Clique, Chain 
 import numpy as np
 import networkx as nx
-from scipy import sparse
+from itertools import combinations
+
+from .clique import Clique, Chain 
+from .cloud import Cloud
 
     
 class Filtration():
@@ -10,24 +12,25 @@ class Filtration():
     maximal cliques of the mutual k-nearest-neighbours of the cloud
 
     Required arguments:
-        points -- Data cloud
+        cloud -- Data cloud containing the points
     """
 
-    def __init__(points):
-        self.points = points
+    def __init__(self, cloud):
+        self.cloud = cloud
         self.complex = []
 
     def build_complex(self):
-        dist_matrix = self.points.compute_dist_matrix()
-        cliques = set()
+        cliques = {Clique([i], 0, 0) for i in range(self.cloud.size)}
 
-        for k in range(1, self.points.dimension):
+        for k in range(1, self.cloud.size):
             # Construct the mutual kNN graph
-            graph = mknn_graph(k, dist_matrix)
+            graph = self.cloud.mknn_graph(k)
 
             # Gather all the maximal cliques
-            new_cliques = {Clique(c,k) for c in nx.find_cliques(graph) 
-                    if c.size <= max_size}
+            new_cliques = {Clique(c, k, 
+                # Computes the diameter of the clique inline
+                max([0] + [self.cloud.dist_matrix[p] for p in combinations(c, 2)]))
+                for c in nx.find_cliques(graph)}
 
             # Add the new cliques
             cliques |=  new_cliques

@@ -11,11 +11,11 @@ class Clique():
         k -- the clique appears when computing mutual k-nearest neighbours
     """
 
-    def __init__(self, points, k = None):
+    def __init__(self, points, k = None, diameter = None):
         self.points = points
         self.k = k
         self.size = len(points)
-        self.diameter = max([0] + [dist(*p) for p in combinations(points, 2)])
+        self.diameter = diameter
 
     @property
     def dim(self):
@@ -32,10 +32,10 @@ class Clique():
                 None else None) for p in self.points]
 
     def __eq__(self, other):
-       return (set(self.points) == set(other.points) 
-               and self.k == other.k)
+       return (set(self.points) == set(other.points))
 
     def __hash__(self):
+        # TODO: find a better hash since hash(n) = n for integer n
         return reduce(operator.xor, [hash(p) for p in self.points])
 
     def __repr__(self):
