@@ -20,7 +20,7 @@ class Cloud():
     def __str__(self):
         return "<Cloud of  %d points in R^%d>" % (self.size, self.dimension)
 
-    def dist_matrix(self):
+    def compute_dist_matrix(self):
         # Use broadcasting to get an array of shape (N,N,n) with the differences of every
         # possible point in points
         differences = self.points[np.newaxis,:] - points[:, np.newaxis]

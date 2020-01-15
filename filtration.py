@@ -1,9 +1,7 @@
-from models import Clique, Simplex, Chain 
+from clique import Clique, Chain 
 import numpy as np
 import networkx as nx
 from scipy import sparse
-import operator
-from functools import reduce
 
     
 class Filtration():
@@ -36,3 +34,4 @@ class Filtration():
 
         self.complex = sorted(cliques, key = lambda c:(c.k, c.size, c.diameter)) 
        
+
