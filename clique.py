@@ -1,5 +1,6 @@
 import operator
 from functools import reduce
+from itertools import combinations
 
 class Clique():
     """
@@ -11,16 +12,14 @@ class Clique():
         k -- the clique appears when computing mutual k-nearest neighbours
     """
 
-    def __init__(self, points, k = None, diameter = None):
+    def __init__(self, points, k = None, dist_matrix = None):
         self.points = points
         self.k = k
         self.size = len(points)
-        self.diameter = diameter
-
-    @property
-    def dim(self):
-        """ Dimension of the clique """
-        return len(self.points)
+        self.dim = self.size - 1
+        self.dist_matrix = dist_matrix
+        self.diameter = (max([0] + [dist_matrix[p] for p in combinations(self.points, 2)])
+                if dist_matrix is not None else None)
 
     @property
     def faces(self):
@@ -28,15 +27,31 @@ class Clique():
         if len(self.points) is 1:
             return []
         else:
-            return [Clique([q for q in self.points if q != p], self.k if self.k is not
-                None else None) for p in self.points]
+            return [Clique([q for q in self.points if q != p], 
+                self.k if self.k is not None else None,
+                self.dist_matrix if self.dist_matrix is not None else None)
+                for p in self.points]
+
+    @property
+    def boundary(self):
+        return Chain(self.faces)
+
+    def faces_all(self):
+        """ Returns a list of all of the cells of the clique """
+        faces = []
+        for d in range(1,self.dim + 1):
+           faces += [Clique(list(p),
+                self.k if self.k is not None else None,
+                self.dist_matrix if self.dist_matrix is not None else None)
+                for p in combinations(self.points, d)]
+        return faces
 
     def __eq__(self, other):
        return (set(self.points) == set(other.points))
 
     def __hash__(self):
         # TODO: find a better hash since hash(n) = n for integer n
-        return reduce(operator.xor, [hash(p) for p in self.points])
+        return reduce(operator.xor, [hash(p) for p in self.points], 0)
 
     def __repr__(self):
         return "C" + str(self.points)
@@ -81,7 +96,6 @@ class Chain():
             return " + ".join([repr(c) for c in self.cliques])
 
     def __str__(self):
-        return f"Chain of {self.dim}-cliques: " + str(self.cliques)
+        return f"Chain of {self.dim}-cliques: " + repr(self)
         
         
-

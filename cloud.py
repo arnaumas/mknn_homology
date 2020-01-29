@@ -15,10 +15,10 @@ class Cloud():
         self.size, self.dim = points.shape
         self.dist_matrix = self.compute_dist_matrix()
 
-    def __str__(self):
-        return "<Cloud of  %d points in R^%d>" % (self.size, self.dim)
-
     def compute_dist_matrix(self):
+        """
+        Computes the distance matrix and assigns it to self.dist_matrix
+        """
         # Use broadcasting to get an array of shape (N,N,n) with the differences of every
         # possible point in points
         differences = self.points[np.newaxis,:] - self.points[:, np.newaxis]
@@ -27,6 +27,16 @@ class Cloud():
         return (differences**2).sum(axis = -1)
 
     def mknn_graph(self,k):
+        """
+        Computes the mutual k-nearest neighbours graph of the cloud and returns it as a
+        NetworkX graph
+        
+        Required arguments:
+            k --- integer, will compute mutual kNN graph
+
+        Return:
+            a NetworkX representation of the mutual kNN graph
+        """
         # Sort the distance matrix so that the i-th row shows the nodes ordered by their
         # distance to node i
         dist_matrix_sorted = self.dist_matrix.argsort(axis = -1)
@@ -44,3 +54,12 @@ class Cloud():
 
         # Return a NetworkX graph built from the adjacency matrix
         return nx.from_numpy_matrix(adj)
+
+    def retrieve_clique(self, clique):
+        """
+        Returns the coordinates of the points corresponding to the given clique
+        """
+        return [self.points[i] for i in clique.points]
+
+    def __str__(self):
+        return "<Cloud of  %d points in R^%d>" % (self.size, self.dim)
