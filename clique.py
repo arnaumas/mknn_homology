@@ -36,15 +36,15 @@ class Clique():
     def boundary(self):
         return Chain(self.faces)
 
-    def faces_all(self):
-        """ Returns a list of all of the cells of the clique """
-        faces = []
-        for d in range(1,self.dim + 1):
-           faces += [Clique(list(p),
-                self.k if self.k is not None else None,
-                self.dist_matrix if self.dist_matrix is not None else None)
-                for p in combinations(self.points, d)]
-        return faces
+    # def faces_all(self):
+    #     """ Returns a list of all of the cells of the clique """
+    #     faces = []
+    #     for d in range(1,self.dim + 1):
+    #        faces += [Clique(list(p),
+    #             self.k if self.k is not None else None,
+    #             self.dist_matrix if self.dist_matrix is not None else None)
+    #             for p in combinations(self.points, d)]
+    #     return faces
 
     def __eq__(self, other):
        return (set(self.points) == set(other.points))
@@ -57,9 +57,9 @@ class Clique():
         return "C" + str(self.points)
 
     def __str__(self):
-        return (f"{self.size}-clique with points " 
+        return (f"{self.dim}-clique with points " 
                 + str(self.points) 
-                + " born at k = {self.k}" if self.k is not None else "")
+                + f" born at k = {self.k}" if self.k is not None else "")
 
 class Chain():
     """
@@ -87,13 +87,13 @@ class Chain():
         return len(self.boundary.cliques) is 0
 
     def __add__(self, other):
-        return Chain(self.cliques ^ other.cliques)
+        return Chain(list(self.cliques ^ other.cliques))
 
     def __repr__(self):
         if len(self.cliques) is 0:
             return "C[]"
         else:
-            return " + ".join([repr(c) for c in self.cliques])
+            return " + ".join([repr(c) for c in list(self.cliques)])
 
     def __str__(self):
         return f"Chain of {self.dim}-cliques: " + repr(self)

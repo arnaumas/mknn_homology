@@ -4,7 +4,7 @@ from math import floor
 
 from clique import Clique, Chain 
 from cloud import Cloud
-from homology import HomologyClass
+# from homology import HomologyClass
 
     
 class Filtration():
@@ -21,21 +21,23 @@ class Filtration():
         self.complex = []
 
     def build_complex(self):
-        cliques = {Clique([i], 0, 0) for i in range(self.cloud.size)}
+        cliques = [Clique([i], 0, 0) for i in range(self.cloud.size)]
 
-        for k in range(1, floor((2/3)*self.cloud.size)):
-            print(k)
+        for k in range(1, self.cloud.size):
             # Construct the mutual kNN graph
             graph = self.cloud.mknn_graph(k)
 
-            # Gather all the maximal cliques
-            new_max_cliques = {Clique(c, k, self.cloud.dist_matrix) for c in
-                    nx.find_cliques(graph)}
+            # Gather all the cliques
+            new_cliques = [Clique(c, k, self.cloud.dist_matrix) for c in
+                    nx.enumerate_all_cliques(graph)]
             # Add the new maximal cliques and their faces
-            cliques |= (new_max_cliques | set(sum([c.faces_all() for c in
-                new_max_cliques], [])))
+            cliques += new_cliques
 
-        self.complex = sorted(cliques, key = lambda c:(c.k, c.size, c.diameter)) 
+        self.complex = sorted(set(cliques), key = lambda c:(c.k, c.size, c.diameter)) 
+
+    def reset(self):
+        self.complex = []
+        self.build_complex()
 
     def __getitem__(self, n):
         """
