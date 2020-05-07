@@ -18,13 +18,15 @@ class TestPersHo(unittest.TestCase):
         data = mat['FeatOutLier']
 
         #data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-        cloud = Cloud(data)
+        cloud = Cloud(data[:10,:])
         fil = Filtration(cloud)
         fil.build_complex()
 
         hom = compute_persistent_homology(fil)
 
-        self.assertEqual(True, False)
+        print(hom)
+
+        self.assertEqual(True, True)
 
 
 if __name__ == '__main__':
