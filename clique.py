@@ -24,13 +24,22 @@ class Clique():
     @property
     def faces(self):
         """ Returns a list of the faces of the clique """
-        if len(self.points) is 1:
+        if self.dim == 0:
             return []
         else:
             return [Clique([q for q in self.points if q != p], 
                 self.k if self.k is not None else None,
                 self.dist_matrix if self.dist_matrix is not None else None)
                 for p in self.points]
+
+    def faces(self, filtration):
+        if self.dim == 0:
+            return []
+
+        else:
+            faces_points = [[q for q in self.points if q != p] for p in self.points]
+            return [f for f in filtration if f.points in faces_points]
+            
 
     @property
     def boundary(self):
