@@ -62,4 +62,4 @@ class Cloud():
         return [self.points[i] for i in clique.points]
 
     def __str__(self):
-        return "<Cloud of  %d points in R^%d>" % (self.size, self.dim)
+        return "<Cloud of %d points in R^%d>" % (self.size, self.dim)
