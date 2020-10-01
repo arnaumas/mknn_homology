@@ -20,7 +20,7 @@ class Cloud():
         Computes the distance matrix and assigns it to self.dist_matrix
         """
         # Use broadcasting to get an array of shape (N,N,n) with the differences of every
-        # possible point in points
+        # possible pair of points
         differences = self.points[np.newaxis,:] - self.points[:, np.newaxis]
 
         # Calculate the squares of the distances by summing along the last axis

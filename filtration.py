@@ -4,11 +4,10 @@ from math import floor
 from functools import reduce
 from operator import add
 
-
-from clique import Clique, Chain 
-from cloud import Cloud
-from homology_dict import HomDict
-from homology import HomologyClass
+from mknn_homology.clique import Clique, Chain 
+from mknn_homology.cloud import Cloud
+from mknn_homology.homology_dict import HomDict
+from mknn_homology.homology import HomologyClass
 
     
 class Filtration():
@@ -39,7 +38,7 @@ class Filtration():
             
             # Add the new maximal cliques and their faces
             cliques += [Clique(c, k, self.cloud.dist_matrix) for c in
-                    nx.enumerate_all_cliques(graph) if len(c) <= 2]
+                   graph.edges]
 
         self.complex = sorted(set(cliques), key = lambda c:(c.k, c.size, c.diameter)) 
 
@@ -81,14 +80,11 @@ class Filtration():
                         self.homology[youngest] = reduce(add, [self.homology[f] for f in faces_other])
 
     def compute_persistence(self):
-        lifetimes = [(g.death - g.birth)/self.k_max if g.is_dead else 1 for g in
-                self.generators]
-        sizes = [len(g.representatives) for g in self.generators]
-
-        self.persistence = zip(lifetimes, sizes)
+        self.lifetimes = [(g.death - g.birth)/self.k_max if g.is_dead else 1 for g in
+                self.generators[0]]
+        self.sizes = [len(g.representatives)/self.cloud.size for g in self.generators[0]]
 
     def reset(self):
-        self.complex = []
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
@@ -104,4 +100,5 @@ class Filtration():
                 yield c
             else:
                 break
+
             

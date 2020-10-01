@@ -1,6 +1,4 @@
-from filtration import Filtration
-from clique import Chain
-from homology_dict import HomDict
+from mknn_homology.clique import Chain
 
 class HomologyClass():
     def __init__(self, dimension, generator, representatives, birth = 0):

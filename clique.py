@@ -13,7 +13,7 @@ class Clique():
     """
 
     def __init__(self, points, k = None, dist_matrix = None):
-        self.points = points
+        self.points = list(points)
         self.k = k
         self.size = len(points)
         self.dim = self.size - 1
