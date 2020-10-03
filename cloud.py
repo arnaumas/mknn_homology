@@ -63,3 +63,4 @@ class Cloud():
 
     def __str__(self):
         return "<Cloud of %d points in R^%d>" % (self.size, self.dim)
+

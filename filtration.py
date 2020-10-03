@@ -22,7 +22,7 @@ class Filtration():
     def __init__(self, cloud):
         self.cloud = cloud
         self.complex = []
-        self.k_max = 0
+        self.k_max = cloud.size - 1
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
@@ -32,7 +32,7 @@ class Filtration():
         # TODO: Determine a good stopping point
         # k = 1
 
-        for k in range(1, self.k_max):
+        for k in range(1, self.k_max + 1):
             # Construct the mutual kNN graph
             graph = self.cloud.mknn_graph(k)
             
@@ -44,6 +44,8 @@ class Filtration():
 
     def compute_persistent_homology(self):
         n = 1
+
+        self.build_complex()
 
         for k in range(self.k_max + 1): 
             for c in self[k]:
