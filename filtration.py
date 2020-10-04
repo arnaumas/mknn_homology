@@ -4,12 +4,15 @@ from math import floor
 from functools import reduce
 from operator import add
 
+import matplotlib as mpl
+from matplotlib import pyplot as plt
+from matplotlib import ticker
+
 from mknn_homology.clique import Clique, Chain 
 from mknn_homology.cloud import Cloud
 from mknn_homology.homology_dict import HomDict
 from mknn_homology.homology import HomologyClass
 
-    
 class Filtration():
     """
     Simplicial filtration indexed by k built from a cloud of points by computing the
@@ -85,6 +88,28 @@ class Filtration():
         self.lifetimes = [(g.death - g.birth)/self.k_max if g.is_dead else 1 for g in
                 self.generators[0]]
         self.sizes = [len(g.representatives)/self.cloud.size for g in self.generators[0]]
+
+    def plot_persistence(self, name, filename):
+        lifetimes = np.array(self.lifetimes)
+        sizes = np.array(self.sizes)
+
+        fig = plt.figure(figsize = (6,6))
+        ax = fig.add_axes([0,0,1,1], aspect = 1)
+        ax.scatter(lifetimes, sizes, c = lifetimes/sizes, cmap = "cool", zorder = 2)
+
+        k = 1
+        for xy in zip(self.lifetimes, self.sizes):
+            plt.annotate(f"{k}", xy, bbox = dict(facecolor = 'white', edgecolor = 'white',
+                alpha = 0.5, zorder = 1))
+            k += 1
+
+        ax.xlabel('Lifetime (normalised)')
+        ax.xaxis.set_major_formatter(ticker.PercentFormatter(xmax = 1))
+        ax.ylabel('Size (normalised)')
+        ax.yaxis.set_major_formatter(ticker.PercentFormatter(xmax = 1))
+        
+        ax.title(name)
+        fig.savefig(filename)
 
     def reset(self):
         self.homology = HomDict()
