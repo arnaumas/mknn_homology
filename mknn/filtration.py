@@ -25,8 +25,12 @@ class Filtration():
         cloud -- Data cloud containing the points
     """
 
-    def __init__(self, cloud):
-        self.cloud = cloud
+    def __init__(self, cloud = None, *args, **kwargs):
+        if cloud:
+            self.cloud = cloud
+        else:
+            cloud = Cloud(kwargs.get("data"))
+            
         self.complex = []
         self.k_max = cloud.size - 1
         self.homology = HomDict()
@@ -93,6 +97,7 @@ class Filtration():
         self.sizes = [len(g.representatives)/self.cloud.size for g in self.generators[0]]
 
     def plot_persistence(self, name, filename):
+        self.compute_persistence()
         lifetimes = np.array(self.lifetimes)
         sizes = np.array(self.sizes)
 
