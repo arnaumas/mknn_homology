@@ -1,17 +1,20 @@
 import numpy as np
-import networkx as nx
-from math import floor
 from functools import reduce
 from operator import add
-
-import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib import ticker
 
-from mknn_homology.clique import Clique, Chain 
-from mknn_homology.cloud import Cloud
-from mknn_homology.homology_dict import HomDict
-from mknn_homology.homology import HomologyClass
+from . import clique
+from .clique import Clique, Chain 
+
+from . import cloud
+from .cloud import Cloud
+
+from . import homology_dict
+from .homology_dict import HomDict
+
+from . import homology
+from .homology import HomologyClass
 
 class Filtration():
     """

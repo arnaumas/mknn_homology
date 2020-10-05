@@ -1,4 +1,5 @@
-from mknn_homology.clique import Chain
+from . import clique
+from .clique import Chain
 
 class HomologyClass():
     def __init__(self, dimension, generator, representatives, birth = 0):
