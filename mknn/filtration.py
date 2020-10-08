@@ -29,10 +29,10 @@ class Filtration():
         if cloud:
             self.cloud = cloud
         else:
-            cloud = Cloud(kwargs.get("data"))
+            self.cloud = Cloud(kwargs.get("data"))
             
         self.complex = []
-        self.k_max = cloud.size - 1
+        self.k_max = self.cloud.size - 1
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
@@ -97,13 +97,20 @@ class Filtration():
         self.sizes = [len(g.representatives)/self.cloud.size for g in self.generators[0]]
 
     def plot_persistence(self, name, filename):
+        fig, ax = self.persistence_plot()
+        
+        ax.title(name)
+        fig.savefig(filename)
+
+    def persistence_plot(self):
         self.compute_persistence()
         lifetimes = np.array(self.lifetimes)
         sizes = np.array(self.sizes)
+        outlierness = lifetimes/sizes
 
-        fig = plt.figure(figsize = (6,6))
-        ax = fig.add_axes([0,0,1,1], aspect = 1)
-        ax.scatter(lifetimes, sizes, c = lifetimes/sizes, cmap = "cool", zorder = 2)
+        fig = plt.figure(figsize = (8,6))
+        ax = fig.add_axes([0,0,1,1])
+        mappable = ax.scatter(lifetimes, sizes, c = lifetimes/sizes, cmap = "cool", zorder = 2)
 
         k = 1
         for xy in zip(self.lifetimes, self.sizes):
@@ -111,13 +118,16 @@ class Filtration():
                 alpha = 0.5, zorder = 1))
             k += 1
 
-        ax.xlabel('Lifetime (normalised)')
+        colorbar = fig.colorbar(mappable)
+        colorbar.set_ticks([outlierness.max(), outlierness.min()])
+        colorbar.set_ticklabels(["100%", "0%"])
+
+        ax.set_xlabel('Lifetime (normalised)')
         ax.xaxis.set_major_formatter(ticker.PercentFormatter(xmax = 1))
-        ax.ylabel('Size (normalised)')
+        ax.set_ylabel('Size (normalised)')
         ax.yaxis.set_major_formatter(ticker.PercentFormatter(xmax = 1))
         
-        ax.title(name)
-        fig.savefig(filename)
+        return fig, ax
 
     def reset(self):
         self.homology = HomDict()
@@ -135,5 +145,3 @@ class Filtration():
                 yield c
             else:
                 break
-
-            
