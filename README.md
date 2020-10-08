@@ -16,7 +16,9 @@ filt = mknn.Filtration(data = data)
 You can find an example case [here](example/example_data.csv). This file
 contains 42 points in two dimensions. The dataset has two main clusters and two
 outliers,
+
 ![Example clusters](example/clusters_example.png).
+
 The two outliers are the points labeled 1 and 2. 
 
 To run the detector on this set, first you should store the data in a `numpy` array as follows
@@ -41,6 +43,7 @@ the plot will be stored.
 ```python
 filt.plot_persistence("persistence_example.png")
 ```
+
 ![Example persistence](example/persistence_example.png).
 
 
