@@ -31,8 +31,7 @@ Then, you build a `Filtration` instance:
 import mknn
 filt = mknn.Filtration(data = data)
 ```
-Next, instruct the `Filtration` instance to build the simplicial complex and
-then to compute its homology:
+Next, instruct the `Filtration` instance to compute its persistent homology
 ```python
 filt.build_complex()
 filt.compute_persistent_homology()

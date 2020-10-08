@@ -96,11 +96,10 @@ class Filtration():
                 self.generators[0]]
         self.sizes = [len(g.representatives)/self.cloud.size for g in self.generators[0]]
 
-    def plot_persistence(self, name, filename):
+    def plot_persistence(self, filename):
         fig, ax = self.persistence_plot()
         
-        ax.title(name)
-        fig.savefig(filename)
+        fig.savefig(filename, bbox_tight = 'tight')
 
     def persistence_plot(self):
         self.compute_persistence()
@@ -109,7 +108,7 @@ class Filtration():
         outlierness = lifetimes/sizes
 
         fig = plt.figure(figsize = (8,6))
-        ax = fig.add_axes([0,0,1,1])
+        ax = fig.subplots()
         mappable = ax.scatter(lifetimes, sizes, c = lifetimes/sizes, cmap = "cool", zorder = 2)
 
         k = 1
