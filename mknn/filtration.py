@@ -43,6 +43,7 @@ class Filtration():
         # k = 1
 
         for k in range(1, self.k_max + 1):
+            print(f"\rProcessing step {k} out of {k_max}", end = "")
             # Construct the mutual kNN graph
             graph = self.cloud.mknn_graph(k)
             
