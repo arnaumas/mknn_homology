@@ -37,19 +37,23 @@ class Filtration():
         self.generators = [[] for _ in range(self.cloud.dim)]
 
     def build_complex(self):
-        cliques = [Clique([i], 0, 0) for i in range(self.cloud.size)]
+        cliques = set([Clique([i], 0, 0) for i in range(self.cloud.size)])
 
         # TODO: Determine a good stopping point
         # k = 1
 
         for k in range(1, self.k_max + 1):
-            print(f"\rProcessing step {k} out of {self.k_max}", end = "")
+            print(f"Processing step {k} out of {self.k_max}...", end = "")
             # Construct the mutual kNN graph
+            print(f"\n\tCalculating MkNN graph...", end = "")
             graph = self.cloud.mknn_graph(k)
+            print(f"\n\tDone!", end = "")
             
             # Add the new maximal cliques and their faces
-            cliques += [Clique(c, k, self.cloud.dist_matrix) for c in
-                   graph.edges]
+            print(f"\n\tGathering cliques...", end = "")
+            cliques = cliques.union(set([Clique(c, k) for c in
+                   graph.edges]))
+            print(f" Done! There are {len(cliques)} cliques", end = "\n")
 
         self.complex = sorted(set(cliques), key = lambda c:(c.k, c.size, c.diameter)) 
 
