@@ -13,7 +13,7 @@ class Cloud():
     def __init__(self, points):
         self.points = points
         self.size, self.dim = points.shape
-        self.dist_matrix = self.compute_dist_matrix()
+        self.dist_matrix = self.compute_dist_matrix().argsort(axis = -1)
 
     def compute_dist_matrix(self):
         """
@@ -37,20 +37,20 @@ class Cloud():
         Return:
             a NetworkX representation of the mutual kNN graph
         """
-        # Sort the distance matrix so that the i-th row shows the nodes ordered by their
-        # distance to node i
-        dist_matrix_sorted = self.dist_matrix.argsort(axis = -1)
-
         # Pick out the k nearest neighbours of every node
-        nearest_neighbours = np.array([(i, dist_matrix_sorted[i,j+1]) for i in
+        print(f"\n\t\tPicking out the nearest neighbours...", end = "")
+        nearest_neighbours = np.array([(i, self.dist_matrix[i,j+1]) for i in
             range(self.size) for j in range(k)])
+        print(f" Done!", end = "")
 
         # Build the adjacency matrix of the directed kNN graph
+        print(f"\n\t\tBuilding the adjacency matrix...", end = "")
         adj_directed = sparse.coo_matrix(([1] * k * self.size, (nearest_neighbours[:, 0],
             nearest_neighbours[:, 1])), shape = (self.size, self.size)).toarray()
 
         # Construct the adjacency matrix of the mutual kNN graph
         adj = adj_directed * adj_directed.T
+        print(f" Done!", end = "")
 
         # Return a NetworkX graph built from the adjacency matrix
         return nx.from_numpy_matrix(adj)
