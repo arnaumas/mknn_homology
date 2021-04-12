@@ -4,6 +4,9 @@ from operator import add
 from matplotlib import pyplot as plt
 from matplotlib import ticker
 
+import torch
+import dgl
+
 from . import clique
 from .clique import Clique, Chain 
 

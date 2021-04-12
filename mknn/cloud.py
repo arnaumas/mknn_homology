@@ -2,6 +2,9 @@ import numpy as np
 import networkx as nx
 from scipy import sparse
 
+import torch
+import dgl
+
 class Cloud():
     """
     Cloud of N points with n characteristics
@@ -21,10 +24,10 @@ class Cloud():
         """
         # Use broadcasting to get an array of shape (N,N,n) with the differences of every
         # possible pair of points
-        differences = self.points[np.newaxis,:] - self.points[:, np.newaxis]
+        differences = torch.unsqueeze(self.points, 1) - torch.unsqueeze(self.points, 0)
 
         # Calculate the squares of the distances by summing along the last axis
-        return (differences**2).sum(axis = -1)
+        return torch.linalg.norm(differences, dim = 2)
 
     def mknn_graph(self,k):
         """
