@@ -16,7 +16,7 @@ class Cloud():
     def __init__(self, points):
         self.points = points
         self.size, self.dim = points.shape
-        self.dist_matrix = self.compute_dist_matrix().argsort(axis = -1)
+        self.dist_matrix = torch.artgsort(self.compute_dist_matrix(), axis = 1) 
 
     def compute_dist_matrix(self):
         """
@@ -40,23 +40,34 @@ class Cloud():
         Return:
             a NetworkX representation of the mutual kNN graph
         """
-        # Pick out the k nearest neighbours of every node
-        print(f"\n\t\tPicking out the nearest neighbours...", end = "")
-        nearest_neighbours = np.array([(i, self.dist_matrix[i,j+1]) for i in
-            range(self.size) for j in range(k)])
-        print(f" Done!", end = "")
 
-        # Build the adjacency matrix of the directed kNN graph
-        print(f"\n\t\tBuilding the adjacency matrix...", end = "")
-        adj_directed = sparse.coo_matrix(([1] * k * self.size, (nearest_neighbours[:, 0],
-            nearest_neighbours[:, 1])), shape = (self.size, self.size)).toarray()
+        # List the k nearest neighbours of each node
+        neighbours = self.dist_matrix[:, 1:k + 1]
 
-        # Construct the adjacency matrix of the mutual kNN graph
-        adj = adj_directed * adj_directed.T
-        print(f" Done!", end = "")
+        # List all the edges of the kNN graph
+        A = torch.stack((
+            torch.unsqueeze(torch.arange(self.size), 1).repeat(1, k),
+            neighbours
+            ), dim = 2).view(-1, 2)
 
-        # Return a NetworkX graph built from the adjacency matrix
-        return nx.from_numpy_matrix(adj)
+        # List all the edges of the reversed kNN graph
+        At = torch.vstack((A[:,1], A[:,0])).transpose(1,0)
+
+        C = torch.unsqueeze(A,0) == torch.unsqueeze(At,1)
+        # Lists all the edges that appear in both adjacency matrices
+        edge_idx = (C[...,0] & C[...,1]).nonzero()
+        adj = A[edge_idx[:,0],:]
+
+        graph = dgl.graph((adj[:,0], adj[:,1]), num_nodes = self.size)
+
+        return graph
+
+        # print(f"\n\t\tPicking out the nearest neighbours...", end = "")
+        # print(f" Done!", end = "")
+
+        # print(f"\n\t\tBuilding the adjacency matrix...", end = "")
+
+        # print(f" Done!", end = "")
 
     def retrieve_clique(self, clique):
         """
