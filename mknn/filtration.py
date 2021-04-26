@@ -98,7 +98,10 @@ class Filtration():
                         self.homology[youngest].kill(k)
                         self.homology[youngest] = reduce(add, [self.homology[f] for f in faces_other])
             
-            pixels[c.points[0], k] = self.homology[c].id
+                pixels[c.points[0], k] = self.homology[c].id
+        
+                if sum([0 if g.is_dead else 1 for g in self.generators[0]]) <= 1:
+                    break
 
         return pixels
 
