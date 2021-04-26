@@ -100,7 +100,7 @@ class Filtration():
             
             pixels[c.points[0], k] = self.homology[c].id
 
-    return pixels
+        return pixels
 
 
     def compute_persistence(self):
