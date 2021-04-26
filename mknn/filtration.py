@@ -58,9 +58,7 @@ class Filtration():
         self.complex = sorted(set(cliques), key = lambda c:(c.k, c.size, c.diameter)) 
 
     def compute_persistent_homology(self):
-        n = 1
-
-        self.build_complex()
+        n = 0
 
         pixels = np.empty(shape = (self.cloud.size, self.k_max))
 
@@ -68,7 +66,7 @@ class Filtration():
             for c in self[k]:
                 # Give the clique a homology class (it is not homologous to anything other
                 # than itself since it is not the face of anything as of now)
-                print(f"\rProcessing clique {n} out of {len(self.complex)}", end = "")
+                print(f"\rProcessing {c}, {n} out of {len(self.complex)}", end = "")
                 n += 1
                 self.homology[c] = HomologyClass(c.dim, Chain([c]), c.points, k)
                 faces = c.faces(self.complex)

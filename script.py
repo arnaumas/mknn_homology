@@ -27,6 +27,6 @@ data = np.column_stack((energy_ravel, entropy_ravel, contrast_ravel))
 
 # Homology computation
 filt = mknn.Filtration(data = data, k_max = 35)
-pixels = filt.compute_persistent_homology()
-np.savetxt("homology.csv", pixels, delimiter = ',')
-print(pixels)
+# pixels = filt.compute_persistent_homology()
+# np.savetxt("homology.csv", pixels, delimiter = ',')
+# print(pixels)
