@@ -26,6 +26,6 @@ contrast_idx = np.argwhere(~np.isnan(contrast))
 data = np.column_stack((energy_ravel, entropy_ravel, contrast_ravel))
 
 # Homology computation
-filt = mknn.Filtration(data = data, k_max = 50)
+filt = mknn.Filtration(data = data, k_max = 35)
 pixels = filt.compute_persistent_homology()
 print(pixels)
