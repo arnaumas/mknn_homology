@@ -31,9 +31,8 @@ class Filtration():
         else:
             self.cloud = Cloud(kwargs.get("data"))
             
-        self.pruning = kwargs.get("pruning")
         self.complex = []
-        self.k_max = round(self.pruning*self.cloud.size) - 1
+        self.k_max = kwargs.get("k_max")
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
@@ -63,6 +62,8 @@ class Filtration():
 
         self.build_complex()
 
+        pixels = np.empty(shape = (self.cloud.size, self.k_max))
+
         for k in range(self.k_max + 1): 
             for c in self[k]:
                 # Give the clique a homology class (it is not homologous to anything other
@@ -72,10 +73,10 @@ class Filtration():
                 self.homology[c] = HomologyClass(c.dim, Chain([c]), c.points, k)
                 faces = c.faces(self.complex)
 
-
                 if c.dim == 0 or reduce(add, [self.homology[f] for f in faces]).is_zero:
                     # This clique closes a cycle
                     self.generators[c.dim].append(self.homology[c])
+                    
 
                 else:
                     # Processing is different for the case of dimension 0
@@ -96,6 +97,11 @@ class Filtration():
 
                         self.homology[youngest].kill(k)
                         self.homology[youngest] = reduce(add, [self.homology[f] for f in faces_other])
+            
+            pixels[c.points[0], k] = self.homology[c].id
+
+    return pixels
+
 
     def compute_persistence(self):
         self.lifetimes = [(g.death - g.birth)/self.k_max if g.is_dead else 1 for g in

@@ -9,6 +9,7 @@ class HomologyClass():
         self.generator = generator
         self.representatives = set(representatives)
         self.lifetime = []
+        self.id = self.representatives[0].points[0]
 
     @property
     def is_dead(self):
