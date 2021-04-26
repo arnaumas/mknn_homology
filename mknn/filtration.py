@@ -33,7 +33,7 @@ class Filtration():
             
         self.pruning = kwargs.get("pruning")
         self.complex = []
-        self.k_max = round(pruning*self.cloud.size) - 1
+        self.k_max = round(self.pruning*self.cloud.size) - 1
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
