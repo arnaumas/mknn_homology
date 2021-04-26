@@ -31,8 +31,9 @@ class Filtration():
         else:
             self.cloud = Cloud(kwargs.get("data"))
             
+        self.pruning = kwargs.get("pruning")
         self.complex = []
-        self.k_max = self.cloud.size - 1
+        self.k_max = round(pruning*self.cloud.size) - 1
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
@@ -42,7 +43,7 @@ class Filtration():
         # TODO: Determine a good stopping point
         # k = 1
 
-        for k in range(1, self.k_max + 1):
+        for k in range(1, self.k_max):
             print(f"Processing step {k} out of {self.k_max}...", end = "")
             # Construct the mutual kNN graph
             print(f"\n\tCalculating MkNN graph...", end = "")
