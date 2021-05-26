@@ -2,6 +2,10 @@ import numpy as np
 import networkx as nx
 from scipy import sparse
 
+def vprint(verbose, *args, **kwargs):
+    if verbose:
+        print(*args, **kwargs)
+
 class Cloud():
     """
     Cloud of N points with n characteristics
@@ -26,31 +30,32 @@ class Cloud():
         # Calculate the squares of the distances by summing along the last axis
         return (differences**2).sum(axis = -1)
 
-    def mknn_graph(self,k):
+    def mknn_graph(self,k,verbose):
         """
         Computes the mutual k-nearest neighbours graph of the cloud and returns it as a
         NetworkX graph
         
         Required arguments:
             k --- integer, will compute mutual kNN graph
+            verbose --- whether the program prints out logs
 
         Return:
             a NetworkX representation of the mutual kNN graph
         """
         # Pick out the k nearest neighbours of every node
-        print(f"\n\t\tPicking out the nearest neighbours...", end = "")
+        vprint(verbose, f"\n\t\tPicking out the nearest neighbours...", end = "")
         nearest_neighbours = np.array([(i, self.dist_matrix[i,j+1]) for i in
             range(self.size) for j in range(k)])
-        print(f" Done!", end = "")
+        vprint(verbose, f" Done!", end = "")
 
         # Build the adjacency matrix of the directed kNN graph
-        print(f"\n\t\tBuilding the adjacency matrix...", end = "")
+        vprint(verbose, f"\n\t\tBuilding the adjacency matrix...", end = "")
         adj_directed = sparse.coo_matrix(([1] * k * self.size, (nearest_neighbours[:, 0],
             nearest_neighbours[:, 1])), shape = (self.size, self.size)).toarray()
 
         # Construct the adjacency matrix of the mutual kNN graph
         adj = adj_directed * adj_directed.T
-        print(f" Done!", end = "")
+        vprint(verbose, f" Done!", end = "")
 
         # Return a NetworkX graph built from the adjacency matrix
         return nx.from_numpy_matrix(adj)

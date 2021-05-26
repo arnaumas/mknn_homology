@@ -16,6 +16,10 @@ from .homology_dict import HomDict
 from . import homology
 from .homology import HomologyClass
 
+def vprint(verbose, *args, **kwargs):
+    if verbose:
+        print(*args, **kwargs)
+
 class Filtration():
     """
     Simplicial filtration indexed by k built from a cloud of points by computing the
@@ -36,37 +40,38 @@ class Filtration():
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
-    def build_complex(self):
+    def build_complex(self, verbose):
         cliques = set([Clique([i], 0, 0) for i in range(self.cloud.size)])
 
         # TODO: Determine a good stopping point
         # k = 1
 
         for k in range(1, self.k_max):
-            print(f"Processing step {k} out of {self.k_max}...", end = "")
+            vprint(verbose, f"Processing step {k} out of {self.k_max}...", end = "")
             # Construct the mutual kNN graph
-            print(f"\n\tCalculating MkNN graph...", end = "")
+            vprint(verbose, f"\n\tCalculating MkNN graph...", end = "")
             graph = self.cloud.mknn_graph(k)
-            print(f"\n\tDone!", end = "")
+            vprint(verbose, f"\n\tDone!", end = "")
             
             # Add the new maximal cliques and their faces
-            print(f"\n\tGathering cliques...", end = "")
+            vprint(verbose, f"\n\tGathering cliques...", end = "")
             cliques = cliques.union(set([Clique(c, k) for c in
                    graph.edges]))
-            print(f" Done! There are {len(cliques)} cliques", end = "\n")
+            vprint(verbose, f" Done! There are {len(cliques)} cliques", end = "\n")
 
         self.complex = sorted(set(cliques), key = lambda c:(c.k, c.size, c.diameter)) 
 
-    def compute_persistent_homology(self):
+    def compute_persistent_homology(self, verbose):
         n = 0
 
-        pixels = np.empty(shape = (self.cloud.size, self.k_max))
+        pixels = np.zeros(shape = (self.cloud.size, self.k_max), dtype = int)
 
-        for k in range(self.k_max + 1): 
+        for k in range(self.k_max): 
+            vprint(verbose, f"Processing step {k}")
             for c in self[k]:
                 # Give the clique a homology class (it is not homologous to anything other
                 # than itself since it is not the face of anything as of now)
-                print(f"\rProcessing {c}, {n} out of {len(self.complex)}", end = "")
+                vprint(verbose, f"\r\tProcessing {c}, {n} out of {len(self.complex)}", end = "")
                 n += 1
                 self.homology[c] = HomologyClass(c.dim, Chain([c]), c.points, k)
                 faces = c.faces(self.complex)
@@ -74,7 +79,7 @@ class Filtration():
                 if c.dim == 0 or reduce(add, [self.homology[f] for f in faces]).is_zero:
                     # This clique closes a cycle
                     self.generators[c.dim].append(self.homology[c])
-                    
+                    pixels[c.points[0], k:] = self.homology[c].id
 
                 else:
                     # Processing is different for the case of dimension 0
@@ -84,6 +89,7 @@ class Filtration():
                         self.homology[large].representatives |= self.homology[small].representatives
                         self.homology[small].kill(k)
                         self.homology[small] = self.homology[large]
+                        pixels[small.points[0], k:-1] = self.homology[small].id
 
                     else:
                         # The youngest face is declared homologous to the sum of the other faces
@@ -95,14 +101,16 @@ class Filtration():
 
                         self.homology[youngest].kill(k)
                         self.homology[youngest] = reduce(add, [self.homology[f] for f in faces_other])
-            
+
+            for c in self[0]:
                 pixels[c.points[0], k] = self.homology[c].id
-        
-                if sum([0 if g.is_dead else 1 for g in self.generators[0]]) <= 1:
-                    break
+
+            gen = sum([0 if g.is_dead else 1 for g in self.generators[0]])
+            vprint(verbose, f"\nThere are {gen} generators", end = "\n")
+            if gen <= 1:
+                break
 
         return pixels
-
 
     def compute_persistence(self):
         self.lifetimes = [(g.death - g.birth)/self.k_max if g.is_dead else 1 for g in
