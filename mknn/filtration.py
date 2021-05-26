@@ -40,7 +40,12 @@ class Filtration():
         self.homology = HomDict()
         self.generators = [[] for _ in range(self.cloud.dim)]
 
-    def build_complex(self, verbose):
+    def build_complex(self, **kwargs):
+        if kwargs.get('verbose'):
+            verbose = True
+        else:
+            verbose = False
+
         cliques = set([Clique([i], 0, 0) for i in range(self.cloud.size)])
 
         # TODO: Determine a good stopping point
@@ -61,8 +66,8 @@ class Filtration():
 
         self.complex = sorted(set(cliques), key = lambda c:(c.k, c.size, c.diameter)) 
 
-    def compute_persistent_homology(self, verbose):
-        n = 0
+    def compute_persistent_homology(self, **kwargs):
+        verbose = kwargs.get('verbose') if kwargs.get('verbose') is not None else False
 
         pixels = np.zeros(shape = (self.cloud.size, self.k_max), dtype = int)
 

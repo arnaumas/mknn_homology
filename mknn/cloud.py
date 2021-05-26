@@ -30,7 +30,7 @@ class Cloud():
         # Calculate the squares of the distances by summing along the last axis
         return (differences**2).sum(axis = -1)
 
-    def mknn_graph(self,k,verbose):
+    def mknn_graph(self,k, **kwargs):
         """
         Computes the mutual k-nearest neighbours graph of the cloud and returns it as a
         NetworkX graph
@@ -42,6 +42,8 @@ class Cloud():
         Return:
             a NetworkX representation of the mutual kNN graph
         """
+        verbose = kwargs.get('verbose') if kwargs.get('verbose') is not None else False
+
         # Pick out the k nearest neighbours of every node
         vprint(verbose, f"\n\t\tPicking out the nearest neighbours...", end = "")
         nearest_neighbours = np.array([(i, self.dist_matrix[i,j+1]) for i in
